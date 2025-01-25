@@ -27,16 +27,21 @@ const test = async () => {
 
   const tracer = traceProvider.getTracer("test");
 
-  await tracer.startActiveSpan("Test Parent", async (testSpan) => {
-    await tracer.startActiveSpan("Test Child 1", async (childSpan1) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      childSpan1.end();
-    });
-    await tracer.startActiveSpan("Test Child 2", async (childSpan2) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      childSpan2.end();
-    });
-    testSpan.end();
+  return tracer.startActiveSpan("Test Parent", (testSpan) => {
+    return tracer
+      .startActiveSpan("Test Child 1", (childSpan1) => {
+        return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
+          childSpan1.end()
+        );
+      })
+      .then(() =>
+        tracer.startActiveSpan("Test Child 2", async (childSpan2) => {
+          return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
+            childSpan2.end()
+          );
+        })
+      )
+      .then(() => testSpan.end());
   });
 };
 
