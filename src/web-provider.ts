@@ -6,7 +6,9 @@ import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
 import { ATTR_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 import { LoggingSpanProcessor } from "./LoggingSpanProcessor.js";
+import { SessionIdSpanProcessor } from "./SessionIdSpanProcessor.js";
 
+console.log("jess was here");
 
 export const loadWebProvider = ({
   serviceName,
@@ -16,14 +18,16 @@ export const loadWebProvider = ({
   serviceName: string;
   otelEndpoint?: string;
 }): WebTracerProvider | null => {
-  if (otelEndpoint.endsWith('/')) {
-    otelEndpoint = otelEndpoint.slice(0, -1)
+  if (otelEndpoint.endsWith("/")) {
+    otelEndpoint = otelEndpoint.slice(0, -1);
   }
-  const headers = (process.env.OTEL_EXPORTER_OTLP_HEADERS ?? '').split(',').reduce((acc, header) => {
-    const [key, value] = header.split('=')
-    acc[key] = value
-    return acc
-  }, {} as Record<string, string>)
+  const headers = (process.env.OTEL_EXPORTER_OTLP_HEADERS ?? "")
+    .split(",")
+    .reduce((acc, header) => {
+      const [key, value] = header.split("=");
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
   try {
     const traceExporter = new OTLPTraceExporter({
       url: `${otelEndpoint}/v1/traces`,
@@ -41,12 +45,13 @@ export const loadWebProvider = ({
       resource: new Resource({
         [ATTR_SERVICE_NAME]: serviceName,
       }),
-      spanProcessors:[
+      spanProcessors: [
         new LoggingSpanProcessor(),
-        spanProcessor
+        new SessionIdSpanProcessor(),
+        spanProcessor,
       ],
     });
-    
+
     provider.register({ contextManager: new ZoneContextManager() });
     TraceApi.setGlobalTracerProvider(provider);
 
