@@ -2,6 +2,8 @@
 
 This repo contains an SSCCE to show an issue that I've seen with the Open Telemetry SDK for JS in the browser.
 
+This is for https://github.com/open-telemetry/opentelemetry-js/issues/5373
+
 ## Install
 
 ```
