@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "resolveJsonModule": true,
+    "noEmit": false,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "outDir": "./public/src",
+    "rootDir": "./src",
+    "target": "es5",
+  }
+}
